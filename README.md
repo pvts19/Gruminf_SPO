@@ -65,9 +65,23 @@ docs/
   REPORT.md       - отчёт по проекту и диаграммы
   TESTS.md        - план тестирования и тест-кейсы
   mockup.svg      - прототипы экранов
+Dockerfile        - образ приложения
+compose.yaml      - запуск через docker compose
 ```
 
-## Запуск
+## Запуск через Docker (проще всего)
+
+Нужен запущенный Docker Desktop. В папке проекта:
+
+```bash
+docker compose up --build
+```
+
+Открыть http://localhost:8000 (Swagger — http://localhost:8000/docs).
+База хранится в томе `salon-data` и не пропадает после `docker compose down`.
+Чтобы удалить и базу: `docker compose down -v`.
+
+## Запуск без Docker
 
 Нужен Python 3.10 или новее.
 
