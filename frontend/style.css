@@ -45,6 +45,12 @@ table {
   width: 100%;
   border-collapse: collapse;
   background: white;
+  margin-bottom: 15px;
+}
+
+td select {
+  width: auto;
+  margin: 0;
 }
 
 th, td {

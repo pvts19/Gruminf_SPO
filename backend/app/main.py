@@ -100,7 +100,7 @@ def new_session(db, user_id):
     return token
 
 
-@app.post("/api/auth/register", status_code=201)
+@app.post("/api/auth/register", status_code=201, tags=["Авторизация"])
 def register(data: RegisterIn, db=Depends(get_db)):
     try:
         cur = db.execute(
@@ -113,7 +113,7 @@ def register(data: RegisterIn, db=Depends(get_db)):
     return {"token": new_session(db, user["id"]), "user": user_out(user)}
 
 
-@app.post("/api/auth/login")
+@app.post("/api/auth/login", tags=["Авторизация"])
 def login(data: LoginIn, db=Depends(get_db)):
     user = db.execute("SELECT * FROM users WHERE email = ?", (data.email.lower(),)).fetchone()
     if user is None or not check_password(data.password, user["password_hash"]):
@@ -121,12 +121,12 @@ def login(data: LoginIn, db=Depends(get_db)):
     return {"token": new_session(db, user["id"]), "user": user_out(user)}
 
 
-@app.get("/api/auth/me")
+@app.get("/api/auth/me", tags=["Авторизация"])
 def me(user=Depends(current_user)):
     return user_out(user)
 
 
-@app.post("/api/auth/logout")
+@app.post("/api/auth/logout", tags=["Авторизация"])
 def logout(creds: HTTPAuthorizationCredentials = Depends(bearer), user=Depends(current_user), db=Depends(get_db)):
     db.execute("DELETE FROM sessions WHERE token = ?", (creds.credentials,))
     db.commit()
@@ -142,13 +142,13 @@ def get_own_pet(db, pet_id, user):
     return pet
 
 
-@app.get("/api/pets")
+@app.get("/api/pets", tags=["Питомцы"])
 def list_pets(user=Depends(current_user), db=Depends(get_db)):
     rows = db.execute("SELECT * FROM pets WHERE owner_id = ? ORDER BY id", (user["id"],)).fetchall()
     return [dict(r) for r in rows]
 
 
-@app.post("/api/pets", status_code=201)
+@app.post("/api/pets", status_code=201, tags=["Питомцы"])
 def create_pet(data: PetIn, user=Depends(current_user), db=Depends(get_db)):
     cur = db.execute(
         "INSERT INTO pets (owner_id, name, species, breed, weight) VALUES (?, ?, ?, ?, ?)",
@@ -158,7 +158,7 @@ def create_pet(data: PetIn, user=Depends(current_user), db=Depends(get_db)):
     return dict(db.execute("SELECT * FROM pets WHERE id = ?", (cur.lastrowid,)).fetchone())
 
 
-@app.put("/api/pets/{pet_id}")
+@app.put("/api/pets/{pet_id}", tags=["Питомцы"])
 def update_pet(pet_id: int, data: PetIn, user=Depends(current_user), db=Depends(get_db)):
     get_own_pet(db, pet_id, user)
     db.execute(
@@ -169,7 +169,7 @@ def update_pet(pet_id: int, data: PetIn, user=Depends(current_user), db=Depends(
     return dict(db.execute("SELECT * FROM pets WHERE id = ?", (pet_id,)).fetchone())
 
 
-@app.delete("/api/pets/{pet_id}")
+@app.delete("/api/pets/{pet_id}", tags=["Питомцы"])
 def delete_pet(pet_id: int, user=Depends(current_user), db=Depends(get_db)):
     get_own_pet(db, pet_id, user)
     active = db.execute(
@@ -190,12 +190,12 @@ def service_out(r):
     return d
 
 
-@app.get("/api/services")
+@app.get("/api/services", tags=["Услуги"])
 def list_services(db=Depends(get_db)):
     return [service_out(r) for r in db.execute("SELECT * FROM services ORDER BY id").fetchall()]
 
 
-@app.post("/api/services", status_code=201)
+@app.post("/api/services", status_code=201, tags=["Услуги"])
 def create_service(data: ServiceIn, admin=Depends(admin_user), db=Depends(get_db)):
     cur = db.execute(
         "INSERT INTO services (title, description, price, duration, is_active) VALUES (?, ?, ?, ?, ?)",
@@ -205,7 +205,7 @@ def create_service(data: ServiceIn, admin=Depends(admin_user), db=Depends(get_db
     return service_out(db.execute("SELECT * FROM services WHERE id = ?", (cur.lastrowid,)).fetchone())
 
 
-@app.put("/api/services/{service_id}")
+@app.put("/api/services/{service_id}", tags=["Услуги"])
 def update_service(service_id: int, data: ServiceIn, admin=Depends(admin_user), db=Depends(get_db)):
     cur = db.execute(
         "UPDATE services SET title = ?, description = ?, price = ?, duration = ?, is_active = ? WHERE id = ?",
@@ -217,7 +217,7 @@ def update_service(service_id: int, data: ServiceIn, admin=Depends(admin_user), 
     return service_out(db.execute("SELECT * FROM services WHERE id = ?", (service_id,)).fetchone())
 
 
-@app.delete("/api/services/{service_id}")
+@app.delete("/api/services/{service_id}", tags=["Услуги"])
 def delete_service(service_id: int, admin=Depends(admin_user), db=Depends(get_db)):
     used = db.execute("SELECT COUNT(*) FROM appointments WHERE service_id = ?", (service_id,)).fetchone()[0]
     if used:
@@ -249,7 +249,7 @@ def get_active_service(db, service_id):
     return service
 
 
-@app.get("/api/slots")
+@app.get("/api/slots", tags=["Записи"])
 def get_slots(date: str, service_id: int, db=Depends(get_db)):
     try:
         day = datetime.strptime(date, "%Y-%m-%d")
@@ -269,7 +269,7 @@ JOIN users u ON u.id = p.owner_id
 """
 
 
-@app.get("/api/appointments")
+@app.get("/api/appointments", tags=["Записи"])
 def list_appointments(user=Depends(current_user), db=Depends(get_db)):
     if user["role"] == "admin":
         rows = db.execute(APPOINTMENT_SELECT + " ORDER BY a.start_at").fetchall()
@@ -278,7 +278,7 @@ def list_appointments(user=Depends(current_user), db=Depends(get_db)):
     return [dict(r) for r in rows]
 
 
-@app.post("/api/appointments", status_code=201)
+@app.post("/api/appointments", status_code=201, tags=["Записи"])
 def create_appointment(data: AppointmentIn, user=Depends(current_user), db=Depends(get_db)):
     get_own_pet(db, data.pet_id, user)
     service = get_active_service(db, data.service_id)
@@ -310,7 +310,7 @@ def get_appointment_for(db, appointment_id, user):
     return a
 
 
-@app.post("/api/appointments/{appointment_id}/cancel")
+@app.post("/api/appointments/{appointment_id}/cancel", tags=["Записи"])
 def cancel_appointment(appointment_id: int, user=Depends(current_user), db=Depends(get_db)):
     a = get_appointment_for(db, appointment_id, user)
     if a["status"] != "booked":
@@ -322,7 +322,7 @@ def cancel_appointment(appointment_id: int, user=Depends(current_user), db=Depen
     return {"ok": True}
 
 
-@app.patch("/api/appointments/{appointment_id}/status")
+@app.patch("/api/appointments/{appointment_id}/status", tags=["Записи"])
 def set_status(appointment_id: int, data: StatusIn, admin=Depends(admin_user), db=Depends(get_db)):
     a = get_appointment_for(db, appointment_id, admin)
     if data.status == "booked" and a["status"] != "booked":
