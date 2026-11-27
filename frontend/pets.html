@@ -98,6 +98,11 @@
           await api('PUT', '/pets/' + editId, data);
         } else {
           await api('POST', '/pets', data);
+          // пришли со страницы записи - возвращаемся туда
+          if (getNext()) {
+            location.href = getNext();
+            return;
+          }
         }
         showMsg('msg', 'Сохранено');
         resetForm();

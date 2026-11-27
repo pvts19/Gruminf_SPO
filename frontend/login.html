@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Вход - Груминг-салон</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="menu"></div>
+
+  <div class="page">
+    <h2>Вход в аккаунт</h2>
+    <p id="nextHint" class="msg ok"></p>
+
+    <div class="grid2">
+      <div class="box">
+        <h3>Уже есть аккаунт</h3>
+        <form id="loginForm">
+          <label class="field">Email <input name="email" type="email" required></label>
+          <label class="field">Пароль <input name="password" type="password" required></label>
+          <button type="submit">Войти</button>
+        </form>
+        <p id="loginMsg" class="msg"></p>
+      </div>
+
+      <div class="box">
+        <h3>Нет аккаунта? Зарегистрируйтесь</h3>
+        <form id="regForm">
+          <label class="field">Имя <input name="name" required></label>
+          <label class="field">Телефон <input name="phone" placeholder="+79991234567" required></label>
+          <label class="field">Email <input name="email" type="email" required></label>
+          <label class="field">Пароль (не меньше 6 символов) <input name="password" type="password" minlength="6" required></label>
+          <button type="submit">Зарегистрироваться</button>
+        </form>
+        <p id="regMsg" class="msg"></p>
+      </div>
+    </div>
+  </div>
+
+  <script src="common.js"></script>
+  <script>
+    initPage(false, true);
+    const next = getNext();
+
+    if (next) {
+      document.getElementById('nextHint').textContent = 'Чтобы записаться, войдите в аккаунт или зарегистрируйтесь.';
+    }
+
+    function goAfterLogin(user) {
+      if (user.role === 'admin') {
+        location.href = 'admin.html';
+      } else {
+        location.href = next || 'index.html';
+      }
+    }
+
+    // уже вошёл - здесь делать нечего
+    if (getUser()) goAfterLogin(getUser());
+
+    function afterLogin(data) {
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      goAfterLogin(data.user);
+    }
+
+    document.getElementById('loginForm').onsubmit = async function (e) {
+      e.preventDefault();
+      showMsg('loginMsg', 'Загрузка...');
+      try {
+        afterLogin(await api('POST', '/auth/login', Object.fromEntries(new FormData(this))));
+      } catch (err) {
+        showMsg('loginMsg', err.message, true);
+      }
+    };
+
+    document.getElementById('regForm').onsubmit = async function (e) {
+      e.preventDefault();
+      showMsg('regMsg', 'Загрузка...');
+      try {
+        afterLogin(await api('POST', '/auth/register', Object.fromEntries(new FormData(this))));
+      } catch (err) {
+        showMsg('regMsg', err.message, true);
+      }
+    };
+  </script>
+</body>
+</html>

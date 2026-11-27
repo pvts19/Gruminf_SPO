@@ -52,11 +52,17 @@ flowchart LR
 
 ```mermaid
 flowchart TD
-    start((Начало)) --> login{Клиент вошёл?}
-    login -- нет --> doLogin[Вход или регистрация] --> hasPet
+    start((Начало)) --> catalog[Открыть каталог услуг]
+    catalog --> service[Выбрать услугу и нажать Записаться]
+    service --> login{Пользователь вошёл?}
+    login -- нет --> hasAcc{Есть аккаунт?}
+    hasAcc -- да --> doLogin[Войти]
+    hasAcc -- нет --> doReg[Зарегистрироваться]
+    doLogin --> hasPet
+    doReg --> hasPet
     login -- да --> hasPet{Есть питомец?}
     hasPet -- нет --> addPet[Добавить питомца] --> choose
-    hasPet -- да --> choose[Выбрать питомца и услугу]
+    hasPet -- да --> choose[Услуга уже выбрана, выбрать питомца]
     choose --> date[Выбрать дату]
     date --> slots[Система показывает свободное время]
     slots --> any{Есть свободное время?}

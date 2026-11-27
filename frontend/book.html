@@ -40,7 +40,9 @@
         return;
       }
       if (pets.length === 0) {
-        document.getElementById('form').outerHTML = emptyBlock('Сначала <a href="pets.html">добавьте питомца</a>.');
+        // после добавления питомца вернём пользователя сюда же, с той же услугой
+        const back = encodeURIComponent('book.html' + location.search);
+        document.getElementById('form').outerHTML = emptyBlock('Чтобы записаться, сначала <a href="pets.html?next=' + back + '">добавьте питомца</a>.');
         return;
       }
       document.getElementById('pet').innerHTML = pets.map(p => '<option value="' + p.id + '">' + esc(p.name) + '</option>').join('');
@@ -49,6 +51,12 @@
       const today = new Date().toISOString().slice(0, 10);
       document.getElementById('date').min = today;
       document.getElementById('date').value = today;
+      // услуга, выбранная на главной странице
+      const chosen = new URLSearchParams(location.search).get('service');
+      if (chosen && services.some(s => s.id == chosen)) {
+        document.getElementById('service').value = chosen;
+      }
+
       showServiceInfo();
       loadSlots();
     }

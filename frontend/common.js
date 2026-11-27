@@ -15,7 +15,7 @@ async function api(method, url, body) {
 
   if (res.status === 401 && url !== '/auth/login') {
     localStorage.clear();
-    location.href = 'index.html';
+    location.href = 'login.html';
   }
 
   const data = await res.json().catch(() => null);
@@ -33,33 +33,49 @@ function getUser() {
   return JSON.parse(localStorage.getItem('user') || 'null');
 }
 
+// куда вернуть пользователя после входа: берём ?next= из адреса,
+// но только если это наша страница (чтобы нельзя было увести на чужой сайт)
+function getNext() {
+  const next = new URLSearchParams(location.search).get('next');
+  if (next && /^[a-z]+\.html(\?[\w=&%-]*)?$/.test(next)) return next;
+  return null;
+}
+
 // проверка входа и меню сверху
-function initPage(onlyAdmin) {
+// onlyAdmin - страница только для админа, isPublic - страницу можно смотреть без входа
+function initPage(onlyAdmin, isPublic) {
   const user = getUser();
-  if (!user) {
-    location.href = 'index.html';
+  const current = location.pathname.split('/').pop() || 'index.html';
+  if (!user && !isPublic) {
+    location.href = 'login.html?next=' + encodeURIComponent(current + location.search);
     return null;
   }
-  if (onlyAdmin && user.role !== 'admin') {
-    location.href = 'pets.html';
+  if (user && onlyAdmin && user.role !== 'admin') {
+    location.href = 'index.html';
     return null;
   }
 
   let pages;
-  if (user.role === 'admin') {
+  if (!user) {
+    pages = [['index.html', 'Услуги']];
+  } else if (user.role === 'admin') {
     pages = [['admin.html', 'Записи'], ['services.html', 'Услуги']];
   } else {
-    pages = [['pets.html', 'Мои питомцы'], ['book.html', 'Записаться'], ['my.html', 'Мои записи']];
+    pages = [['index.html', 'Услуги'], ['pets.html', 'Мои питомцы'], ['my.html', 'Мои записи']];
   }
   // подсвечиваем ссылку на текущую страницу
-  const current = location.pathname.split('/').pop();
   let links = '';
   for (const p of pages) {
     links += '<a class="link' + (p[0] === current ? ' active' : '') + '" href="' + p[0] + '">' + p[1] + '</a>';
   }
+  let right;
+  if (user) {
+    right = '<span class="user">' + esc(user.name) + '</span><button class="small" onclick="logout()">Выйти</button>';
+  } else {
+    right = '<span class="user"></span><a href="login.html"><button class="small primary">Войти</button></a>';
+  }
   document.getElementById('menu').innerHTML =
-    '<a class="logo" href="' + pages[0][0] + '">🐾 Пушистик</a>' + links +
-    '<span class="user">' + esc(user.name) + '</span><button class="small" onclick="logout()">Выйти</button>';
+    '<a class="logo" href="' + pages[0][0] + '">🐾 Пушистик</a>' + links + right;
   return user;
 }
 

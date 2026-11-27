@@ -96,6 +96,40 @@ h3 {
   align-items: start;
 }
 
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0;
+}
+
+.card h3 {
+  margin-bottom: 8px;
+}
+
+.card p {
+  flex: 1;
+  margin: 0 0 16px;
+}
+
+.card-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 16px;
+}
+
+.price {
+  font-size: 22px;
+  font-weight: bold;
+  color: var(--green-dark);
+}
+
 .hero {
   text-align: center;
   margin: 20px 0 30px;
@@ -279,6 +313,10 @@ td.actions {
 .msg.ok {
   color: var(--green-dark);
   background: var(--green-light);
+}
+
+a {
+  color: var(--green);
 }
 
 .empty {
