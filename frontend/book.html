@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Записаться</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="menu"></div>
+
+  <h2>Запись на груминг</h2>
+  <div class="box" id="form">
+    Питомец <select id="pet"></select>
+    Услуга <select id="service"></select>
+    <p id="serviceInfo"></p>
+    Дата <input type="date" id="date">
+    <div>Свободное время:</div>
+    <div id="slots">Выберите дату</div>
+    <br>
+    Комментарий для мастера <textarea id="comment" rows="3"></textarea>
+    <button id="bookBtn">Записаться</button>
+    <p id="msg" class="msg"></p>
+  </div>
+
+  <script src="common.js"></script>
+  <script>
+    initPage();
+    let services = [];
+    let selectedTime = null;
+
+    async function start() {
+      let pets;
+      try {
+        pets = await api('GET', '/pets');
+        services = (await api('GET', '/services')).filter(s => s.is_active);
+      } catch (err) {
+        showMsg('msg', err.message, true);
+        return;
+      }
+      if (pets.length === 0) {
+        document.getElementById('form').innerHTML = '<p>Сначала <a href="pets.html">добавьте питомца</a>.</p>';
+        return;
+      }
+      document.getElementById('pet').innerHTML = pets.map(p => '<option value="' + p.id + '">' + esc(p.name) + '</option>').join('');
+      document.getElementById('service').innerHTML = services.map(s => '<option value="' + s.id + '">' + esc(s.title) + '</option>').join('');
+
+      const today = new Date().toISOString().slice(0, 10);
+      document.getElementById('date').min = today;
+      document.getElementById('date').value = today;
+      showServiceInfo();
+      loadSlots();
+    }
+
+    function showServiceInfo() {
+      const s = services.find(x => x.id == document.getElementById('service').value);
+      document.getElementById('serviceInfo').textContent = s ? s.description + '. Цена: ' + s.price + ' руб., длительность: ' + s.duration + ' мин.' : '';
+    }
+
+    async function loadSlots() {
+      selectedTime = null;
+      const date = document.getElementById('date').value;
+      const serviceId = document.getElementById('service').value;
+      const div = document.getElementById('slots');
+      if (!date) {
+        div.textContent = 'Выберите дату';
+        return;
+      }
+      div.textContent = 'Загрузка...';
+      try {
+        const slots = await api('GET', '/slots?date=' + date + '&service_id=' + serviceId);
+        if (slots.length === 0) {
+          div.textContent = 'На этот день свободного времени нет';
+          return;
+        }
+        div.innerHTML = slots.map(t => '<button class="slot" onclick="selectTime(this, \'' + t + '\')">' + t + '</button>').join('');
+      } catch (err) {
+        div.textContent = err.message;
+      }
+    }
+
+    function selectTime(btn, t) {
+      document.querySelectorAll('.slot').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      selectedTime = t;
+    }
+
+    document.getElementById('service').onchange = function () { showServiceInfo(); loadSlots(); };
+    document.getElementById('date').onchange = loadSlots;
+
+    document.getElementById('bookBtn').onclick = async function () {
+      if (!selectedTime) {
+        showMsg('msg', 'Выберите время', true);
+        return;
+      }
+      try {
+        await api('POST', '/appointments', {
+          pet_id: Number(document.getElementById('pet').value),
+          service_id: Number(document.getElementById('service').value),
+          start_at: document.getElementById('date').value + 'T' + selectedTime,
+          comment: document.getElementById('comment').value
+        });
+        alert('Вы записаны!');
+        location.href = 'my.html';
+      } catch (err) {
+        showMsg('msg', err.message, true);
+        loadSlots();
+      }
+    };
+
+    start();
+  </script>
+</body>
+</html>

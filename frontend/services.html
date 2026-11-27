@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Услуги</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="menu"></div>
+
+  <h2>Услуги салона</h2>
+  <div id="list">Загрузка...</div>
+
+  <div class="box">
+    <h3 id="formTitle">Новая услуга</h3>
+    <form id="serviceForm">
+      Название <input name="title" required>
+      Описание <textarea name="description" rows="2"></textarea>
+      Цена, руб. <input name="price" type="number" min="1" required>
+      Длительность, мин (кратно 30) <input name="duration" type="number" min="30" step="30" value="60" required>
+      <label><input type="checkbox" name="is_active" checked style="display:inline; width:auto"> Доступна для записи</label>
+      <br>
+      <button type="submit">Сохранить</button>
+      <button type="button" onclick="resetForm()">Очистить</button>
+    </form>
+    <p id="msg" class="msg"></p>
+  </div>
+
+  <script src="common.js"></script>
+  <script>
+    initPage(true);
+    let services = [];
+    let editId = null;
+
+    async function load() {
+      try {
+        services = await api('GET', '/services');
+      } catch (err) {
+        document.getElementById('list').textContent = err.message;
+        return;
+      }
+      if (services.length === 0) {
+        document.getElementById('list').innerHTML = '<p>Услуг пока нет</p>';
+        return;
+      }
+      let html = '<table><tr><th>Название</th><th>Описание</th><th>Цена</th><th>Длительность</th><th>Доступна</th><th></th></tr>';
+      for (const s of services) {
+        html += '<tr><td>' + esc(s.title) + '</td><td>' + esc(s.description) + '</td><td>' + s.price + ' руб.</td><td>' +
+          s.duration + ' мин</td><td>' + (s.is_active ? 'да' : 'нет') + '</td><td>' +
+          '<button onclick="edit(' + s.id + ')">Изменить</button> ' +
+          '<button onclick="removeService(' + s.id + ')">Удалить</button></td></tr>';
+      }
+      document.getElementById('list').innerHTML = html + '</table>';
+    }
+
+    function edit(id) {
+      const s = services.find(x => x.id === id);
+      const form = document.getElementById('serviceForm');
+      form.title.value = s.title;
+      form.description.value = s.description;
+      form.price.value = s.price;
+      form.duration.value = s.duration;
+      form.is_active.checked = s.is_active;
+      editId = id;
+      document.getElementById('formTitle').textContent = 'Изменить услугу';
+    }
+
+    function resetForm() {
+      document.getElementById('serviceForm').reset();
+      editId = null;
+      document.getElementById('formTitle').textContent = 'Новая услуга';
+    }
+
+    async function removeService(id) {
+      if (!confirm('Удалить услугу?')) return;
+      try {
+        await api('DELETE', '/services/' + id);
+        showMsg('msg', 'Услуга удалена');
+        load();
+      } catch (err) {
+        showMsg('msg', err.message, true);
+      }
+    }
+
+    document.getElementById('serviceForm').onsubmit = async function (e) {
+      e.preventDefault();
+      const data = {
+        title: this.title.value,
+        description: this.description.value,
+        price: Number(this.price.value),
+        duration: Number(this.duration.value),
+        is_active: this.is_active.checked
+      };
+      try {
+        if (editId) {
+          await api('PUT', '/services/' + editId, data);
+        } else {
+          await api('POST', '/services', data);
+        }
+        showMsg('msg', 'Сохранено');
+        resetForm();
+        load();
+      } catch (err) {
+        showMsg('msg', err.message, true);
+      }
+    };
+
+    load();
+  </script>
+</body>
+</html>

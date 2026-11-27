@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Все записи</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="menu"></div>
+
+  <h2>Все записи салона</h2>
+  Показать:
+  <select id="filter" style="display:inline; width:auto">
+    <option value="booked">Только активные</option>
+    <option value="">Все</option>
+  </select>
+  <p id="msg" class="msg"></p>
+  <div id="list">Загрузка...</div>
+
+  <script src="common.js"></script>
+  <script>
+    initPage(true);
+
+    async function load() {
+      let rows;
+      try {
+        rows = await api('GET', '/appointments');
+      } catch (err) {
+        document.getElementById('list').textContent = err.message;
+        return;
+      }
+      const f = document.getElementById('filter').value;
+      if (f) rows = rows.filter(a => a.status === f);
+      if (rows.length === 0) {
+        document.getElementById('list').innerHTML = '<p>Записей нет</p>';
+        return;
+      }
+      let html = '<table><tr><th>Дата и время</th><th>Клиент</th><th>Питомец</th><th>Услуга</th><th>Цена</th><th>Комментарий</th><th>Статус</th></tr>';
+      for (const a of rows) {
+        html += '<tr><td>' + formatDate(a.start_at) + '–' + a.end_at.slice(11, 16) + '</td><td>' + esc(a.owner_name) + '<br>' + esc(a.owner_phone) +
+          '</td><td>' + esc(a.pet_name) + ' (' + a.species + ')</td><td>' + esc(a.service_title) + '</td><td>' + a.price +
+          ' руб.</td><td>' + esc(a.comment) + '</td><td><select onchange="setStatus(' + a.id + ', this.value)">';
+        for (const s in STATUS) {
+          html += '<option value="' + s + '"' + (s === a.status ? ' selected' : '') + '>' + STATUS[s] + '</option>';
+        }
+        html += '</select></td></tr>';
+      }
+      document.getElementById('list').innerHTML = html + '</table>';
+    }
+
+    async function setStatus(id, status) {
+      try {
+        await api('PATCH', '/appointments/' + id + '/status', { status });
+        showMsg('msg', 'Статус изменён');
+      } catch (err) {
+        showMsg('msg', err.message, true);
+      }
+      load();
+    }
+
+    document.getElementById('filter').onchange = load;
+    load();
+  </script>
+</body>
+</html>

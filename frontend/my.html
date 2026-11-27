@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Мои записи</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="menu"></div>
+
+  <h2>Мои записи</h2>
+  <p id="msg" class="msg"></p>
+  <div id="list">Загрузка...</div>
+
+  <script src="common.js"></script>
+  <script>
+    initPage();
+
+    async function load() {
+      let rows;
+      try {
+        rows = await api('GET', '/appointments');
+      } catch (err) {
+        document.getElementById('list').textContent = err.message;
+        return;
+      }
+      if (rows.length === 0) {
+        document.getElementById('list').innerHTML = '<p>Записей пока нет. <a href="book.html">Записаться</a></p>';
+        return;
+      }
+      let html = '<table><tr><th>Дата и время</th><th>Питомец</th><th>Услуга</th><th>Цена</th><th>Статус</th><th></th></tr>';
+      for (const a of rows) {
+        html += '<tr><td>' + formatDate(a.start_at) + '</td><td>' + esc(a.pet_name) + '</td><td>' + esc(a.service_title) +
+          '</td><td>' + a.price + ' руб.</td><td>' + STATUS[a.status] + '</td><td>' +
+          (a.status === 'booked' ? '<button onclick="cancel(' + a.id + ')">Отменить</button>' : '') + '</td></tr>';
+      }
+      document.getElementById('list').innerHTML = html + '</table>';
+    }
+
+    async function cancel(id) {
+      if (!confirm('Отменить запись?')) return;
+      try {
+        await api('POST', '/appointments/' + id + '/cancel');
+        showMsg('msg', 'Запись отменена');
+        load();
+      } catch (err) {
+        showMsg('msg', err.message, true);
+      }
+    }
+
+    load();
+  </script>
+</body>
+</html>

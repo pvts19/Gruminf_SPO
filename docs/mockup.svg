@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="900" font-family="Arial" font-size="13">
+  <rect width="1240" height="900" fill="#fff"/>
+  <style>
+    .scr { fill: #fafafa; stroke: #333; stroke-width: 2 }
+    .bar { fill: #4a7c59 }
+    .inp { fill: #fff; stroke: #999 }
+    .btn { fill: #ddd; stroke: #666 }
+    .t { font-size: 16px; font-weight: bold }
+    .w { fill: #fff }
+    .g { fill: #777 }
+  </style>
+
+  <!-- 1. Вход -->
+  <text x="20" y="25" class="t">1. Вход и регистрация (index.html)</text>
+  <rect x="20" y="35" width="580" height="400" class="scr"/>
+  <rect x="20" y="35" width="580" height="30" class="bar"/>
+  <text x="30" y="55" class="w">Груминг-салон «Пушистик»</text>
+  <text x="40" y="95" class="t">Вход</text>
+  <text x="40" y="120">Email</text><rect x="40" y="125" width="220" height="24" class="inp"/>
+  <text x="40" y="170">Пароль</text><rect x="40" y="175" width="220" height="24" class="inp"/>
+  <rect x="40" y="210" width="80" height="26" class="btn"/><text x="58" y="228">Войти</text>
+  <text x="320" y="95" class="t">Регистрация</text>
+  <text x="320" y="120">Имя</text><rect x="320" y="125" width="220" height="24" class="inp"/>
+  <text x="320" y="170">Телефон</text><rect x="320" y="175" width="220" height="24" class="inp"/>
+  <text x="320" y="220">Email</text><rect x="320" y="225" width="220" height="24" class="inp"/>
+  <text x="320" y="270">Пароль</text><rect x="320" y="275" width="220" height="24" class="inp"/>
+  <rect x="320" y="310" width="170" height="26" class="btn"/><text x="332" y="328">Зарегистрироваться</text>
+  <text x="40" y="380" fill="red">Неверный email или пароль</text>
+
+  <!-- 2. Питомцы -->
+  <text x="640" y="25" class="t">2. Мои питомцы (pets.html)</text>
+  <rect x="640" y="35" width="580" height="400" class="scr"/>
+  <rect x="640" y="35" width="580" height="30" class="bar"/>
+  <text x="650" y="55" class="w">Пушистик   Мои питомцы   Записаться   Мои записи</text>
+  <rect x="660" y="80" width="540" height="25" fill="#e0e0e0" stroke="#999"/>
+  <text x="670" y="97">Кличка        Вид         Порода        Вес</text>
+  <rect x="660" y="105" width="540" height="25" class="inp"/>
+  <text x="670" y="122">Бобик         собака      шпиц          3.5 кг     [Изменить] [Удалить]</text>
+  <rect x="660" y="130" width="540" height="25" class="inp"/>
+  <text x="670" y="147">Мурка         кошка       британская    4 кг       [Изменить] [Удалить]</text>
+  <text x="660" y="190" class="t">Добавить питомца</text>
+  <text x="660" y="215">Кличка</text><rect x="660" y="220" width="220" height="24" class="inp"/>
+  <text x="660" y="265">Вид</text><rect x="660" y="270" width="220" height="24" class="inp"/><text x="860" y="287">▼</text>
+  <text x="660" y="315">Порода</text><rect x="660" y="320" width="220" height="24" class="inp"/>
+  <text x="900" y="215">Вес, кг</text><rect x="900" y="220" width="120" height="24" class="inp"/>
+  <rect x="660" y="360" width="100" height="26" class="btn"/><text x="675" y="378">Сохранить</text>
+
+  <!-- 3. Запись -->
+  <text x="20" y="470" class="t">3. Запись на груминг (book.html)</text>
+  <rect x="20" y="480" width="580" height="400" class="scr"/>
+  <rect x="20" y="480" width="580" height="30" class="bar"/>
+  <text x="30" y="500" class="w">Пушистик   Мои питомцы   Записаться   Мои записи</text>
+  <text x="40" y="540">Питомец</text><rect x="40" y="545" width="220" height="24" class="inp"/><text x="45" y="562">Бобик ▼</text>
+  <text x="40" y="590">Услуга</text><rect x="40" y="595" width="220" height="24" class="inp"/><text x="45" y="612">Гигиеническая стрижка ▼</text>
+  <text x="40" y="640" class="g">Цена: 1200 руб., длительность: 60 мин.</text>
+  <text x="40" y="665">Дата</text><rect x="40" y="670" width="220" height="24" class="inp"/><text x="45" y="687">02.12.2026</text>
+  <text x="40" y="715">Свободное время:</text>
+  <rect x="40" y="722" width="50" height="24" class="btn"/><text x="47" y="739">09:00</text>
+  <rect x="95" y="722" width="50" height="24" fill="#4a7c59"/><text x="102" y="739" class="w">12:00</text>
+  <rect x="150" y="722" width="50" height="24" class="btn"/><text x="157" y="739">12:30</text>
+  <rect x="205" y="722" width="50" height="24" class="btn"/><text x="212" y="739">13:00</text>
+  <text x="265" y="739">...</text>
+  <text x="40" y="770">Комментарий</text><rect x="40" y="775" width="300" height="40" class="inp"/>
+  <rect x="40" y="830" width="110" height="26" class="btn"/><text x="52" y="848">Записаться</text>
+
+  <!-- 4. Админ -->
+  <text x="640" y="470" class="t">4. Все записи — администратор (admin.html)</text>
+  <rect x="640" y="480" width="580" height="400" class="scr"/>
+  <rect x="640" y="480" width="580" height="30" class="bar"/>
+  <text x="650" y="500" class="w">Пушистик   Записи   Услуги</text>
+  <text x="660" y="540">Показать: [Только активные ▼]</text>
+  <rect x="660" y="555" width="540" height="25" fill="#e0e0e0" stroke="#999"/>
+  <text x="665" y="572">Дата и время     Клиент       Питомец       Услуга          Статус</text>
+  <rect x="660" y="580" width="540" height="35" class="inp"/>
+  <text x="665" y="602">02.12 10:00–11:00  Иван          Бобик        Гигиен. стрижка   [Записан ▼]</text>
+  <rect x="660" y="615" width="540" height="35" class="inp"/>
+  <text x="665" y="637">02.12 12:00–14:00  Мария         Мурка        Комплексный      [Записан ▼]</text>
+  <text x="660" y="690" class="g">Статус можно сменить на «Выполнено» или «Отменено»</text>
+</svg>

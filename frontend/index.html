@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Вход - Груминг-салон</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="menu"><b>Груминг-салон «Пушистик»</b></div>
+
+  <div class="box">
+    <h2>Вход</h2>
+    <form id="loginForm">
+      Email <input name="email" type="email" required>
+      Пароль <input name="password" type="password" required>
+      <button type="submit">Войти</button>
+    </form>
+    <p id="loginMsg" class="msg"></p>
+  </div>
+
+  <div class="box">
+    <h2>Регистрация</h2>
+    <form id="regForm">
+      Имя <input name="name" required>
+      Телефон <input name="phone" placeholder="+79991234567" required>
+      Email <input name="email" type="email" required>
+      Пароль (не меньше 6 символов) <input name="password" type="password" minlength="6" required>
+      <button type="submit">Зарегистрироваться</button>
+    </form>
+    <p id="regMsg" class="msg"></p>
+  </div>
+
+  <script src="common.js"></script>
+  <script>
+    function afterLogin(data) {
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      location.href = data.user.role === 'admin' ? 'admin.html' : 'pets.html';
+    }
+
+    if (getUser()) {
+      location.href = getUser().role === 'admin' ? 'admin.html' : 'pets.html';
+    }
+
+    document.getElementById('loginForm').onsubmit = async function (e) {
+      e.preventDefault();
+      showMsg('loginMsg', 'Загрузка...');
+      try {
+        const data = await api('POST', '/auth/login', Object.fromEntries(new FormData(this)));
+        afterLogin(data);
+      } catch (err) {
+        showMsg('loginMsg', err.message, true);
+      }
+    };
+
+    document.getElementById('regForm').onsubmit = async function (e) {
+      e.preventDefault();
+      showMsg('regMsg', 'Загрузка...');
+      try {
+        const data = await api('POST', '/auth/register', Object.fromEntries(new FormData(this)));
+        afterLogin(data);
+      } catch (err) {
+        showMsg('regMsg', err.message, true);
+      }
+    };
+  </script>
+</body>
+</html>
