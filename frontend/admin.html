@@ -2,20 +2,24 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Все записи</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div id="menu"></div>
 
-  <h2>Все записи салона</h2>
-  Показать:
-  <select id="filter" style="display:inline; width:auto">
-    <option value="booked">Только активные</option>
-    <option value="">Все</option>
-  </select>
-  <p id="msg" class="msg"></p>
-  <div id="list">Загрузка...</div>
+  <div class="page">
+    <h2>Все записи салона</h2>
+    <label class="field">Показать
+      <select id="filter" style="max-width: 220px">
+        <option value="booked">Только активные</option>
+        <option value="">Все</option>
+      </select>
+    </label>
+    <p id="msg" class="msg"></p>
+    <div id="list" class="hint">Загрузка...</div>
+  </div>
 
   <script src="common.js"></script>
   <script>
@@ -32,14 +36,15 @@
       const f = document.getElementById('filter').value;
       if (f) rows = rows.filter(a => a.status === f);
       if (rows.length === 0) {
-        document.getElementById('list').innerHTML = '<p>Записей нет</p>';
+        document.getElementById('list').innerHTML = emptyBlock('Записей нет');
         return;
       }
       let html = '<table><tr><th>Дата и время</th><th>Клиент</th><th>Питомец</th><th>Услуга</th><th>Цена</th><th>Комментарий</th><th>Статус</th></tr>';
       for (const a of rows) {
-        html += '<tr><td>' + formatDate(a.start_at) + '–' + a.end_at.slice(11, 16) + '</td><td>' + esc(a.owner_name) + '<br>' + esc(a.owner_phone) +
-          '</td><td>' + esc(a.pet_name) + ' (' + a.species + ')</td><td>' + esc(a.service_title) + '</td><td>' + a.price +
-          ' руб.</td><td>' + esc(a.comment) + '</td><td><select onchange="setStatus(' + a.id + ', this.value)">';
+        html += '<tr><td><b>' + formatDate(a.start_at) + '–' + a.end_at.slice(11, 16) + '</b></td><td>' + esc(a.owner_name) +
+          '<br><span class="hint">' + esc(a.owner_phone) + '</span></td><td>' + esc(a.pet_name) + '<br><span class="hint">' + a.species +
+          '</span></td><td>' + esc(a.service_title) + '</td><td>' + a.price + ' руб.</td><td>' + esc(a.comment) +
+          '</td><td><select onchange="setStatus(' + a.id + ', this.value)">';
         for (const s in STATUS) {
           html += '<option value="' + s + '"' + (s === a.status ? ' selected' : '') + '>' + STATUS[s] + '</option>';
         }

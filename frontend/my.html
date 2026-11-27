@@ -2,15 +2,18 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Мои записи</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div id="menu"></div>
 
-  <h2>Мои записи</h2>
-  <p id="msg" class="msg"></p>
-  <div id="list">Загрузка...</div>
+  <div class="page">
+    <h2>Мои записи</h2>
+    <p id="msg" class="msg"></p>
+    <div id="list" class="hint">Загрузка...</div>
+  </div>
 
   <script src="common.js"></script>
   <script>
@@ -25,14 +28,14 @@
         return;
       }
       if (rows.length === 0) {
-        document.getElementById('list').innerHTML = '<p>Записей пока нет. <a href="book.html">Записаться</a></p>';
+        document.getElementById('list').innerHTML = emptyBlock('Записей пока нет. <a href="book.html">Записаться</a>');
         return;
       }
       let html = '<table><tr><th>Дата и время</th><th>Питомец</th><th>Услуга</th><th>Цена</th><th>Статус</th><th></th></tr>';
       for (const a of rows) {
-        html += '<tr><td>' + formatDate(a.start_at) + '</td><td>' + esc(a.pet_name) + '</td><td>' + esc(a.service_title) +
-          '</td><td>' + a.price + ' руб.</td><td>' + STATUS[a.status] + '</td><td>' +
-          (a.status === 'booked' ? '<button onclick="cancel(' + a.id + ')">Отменить</button>' : '') + '</td></tr>';
+        html += '<tr><td><b>' + formatDate(a.start_at) + '</b></td><td>' + esc(a.pet_name) + '</td><td>' + esc(a.service_title) +
+          '</td><td>' + a.price + ' руб.</td><td>' + statusBadge(a.status) + '</td><td class="actions">' +
+          (a.status === 'booked' ? '<button class="small danger" onclick="cancel(' + a.id + ')">Отменить</button>' : '') + '</td></tr>';
       }
       document.getElementById('list').innerHTML = html + '</table>';
     }

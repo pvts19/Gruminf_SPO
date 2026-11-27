@@ -2,28 +2,30 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Услуги</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div id="menu"></div>
 
-  <h2>Услуги салона</h2>
-  <div id="list">Загрузка...</div>
+  <div class="page">
+    <h2>Услуги салона</h2>
+    <div id="list" class="hint">Загрузка...</div>
 
-  <div class="box">
-    <h3 id="formTitle">Новая услуга</h3>
-    <form id="serviceForm">
-      Название <input name="title" required>
-      Описание <textarea name="description" rows="2"></textarea>
-      Цена, руб. <input name="price" type="number" min="1" required>
-      Длительность, мин (кратно 30) <input name="duration" type="number" min="30" step="30" value="60" required>
-      <label><input type="checkbox" name="is_active" checked style="display:inline; width:auto"> Доступна для записи</label>
-      <br>
-      <button type="submit">Сохранить</button>
-      <button type="button" onclick="resetForm()">Очистить</button>
-    </form>
-    <p id="msg" class="msg"></p>
+    <div class="box">
+      <h3 id="formTitle">Новая услуга</h3>
+      <form id="serviceForm">
+        <label class="field">Название <input name="title" required></label>
+        <label class="field">Описание <textarea name="description" rows="2"></textarea></label>
+        <label class="field">Цена, руб. <input name="price" type="number" min="1" required></label>
+        <label class="field">Длительность, мин (кратно 30) <input name="duration" type="number" min="30" step="30" value="60" required></label>
+        <label class="field"><input type="checkbox" name="is_active" checked> Доступна для записи</label>
+        <button type="submit">Сохранить</button>
+        <button type="button" onclick="resetForm()">Очистить</button>
+      </form>
+      <p id="msg" class="msg"></p>
+    </div>
   </div>
 
   <script src="common.js"></script>
@@ -40,15 +42,17 @@
         return;
       }
       if (services.length === 0) {
-        document.getElementById('list').innerHTML = '<p>Услуг пока нет</p>';
+        document.getElementById('list').innerHTML = emptyBlock('Услуг пока нет');
         return;
       }
-      let html = '<table><tr><th>Название</th><th>Описание</th><th>Цена</th><th>Длительность</th><th>Доступна</th><th></th></tr>';
+      let html = '<table><tr><th>Название</th><th>Описание</th><th>Цена</th><th>Длительность</th><th>Статус</th><th></th></tr>';
       for (const s of services) {
-        html += '<tr><td>' + esc(s.title) + '</td><td>' + esc(s.description) + '</td><td>' + s.price + ' руб.</td><td>' +
-          s.duration + ' мин</td><td>' + (s.is_active ? 'да' : 'нет') + '</td><td>' +
-          '<button onclick="edit(' + s.id + ')">Изменить</button> ' +
-          '<button onclick="removeService(' + s.id + ')">Удалить</button></td></tr>';
+        html += '<tr><td><b>' + esc(s.title) + '</b></td><td class="hint">' + esc(s.description) + '</td><td>' + s.price + ' руб.</td><td>' +
+          s.duration + ' мин</td><td>' +
+          (s.is_active ? '<span class="badge done">Доступна</span>' : '<span class="badge cancelled">Отключена</span>') +
+          '</td><td class="actions">' +
+          '<button class="small" onclick="edit(' + s.id + ')">Изменить</button> ' +
+          '<button class="small danger" onclick="removeService(' + s.id + ')">Удалить</button></td></tr>';
       }
       document.getElementById('list').innerHTML = html + '</table>';
     }

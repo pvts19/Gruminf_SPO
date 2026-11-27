@@ -2,24 +2,26 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Записаться</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div id="menu"></div>
 
-  <h2>Запись на груминг</h2>
-  <div class="box" id="form">
-    Питомец <select id="pet"></select>
-    Услуга <select id="service"></select>
-    <p id="serviceInfo"></p>
-    Дата <input type="date" id="date">
-    <div>Свободное время:</div>
-    <div id="slots">Выберите дату</div>
-    <br>
-    Комментарий для мастера <textarea id="comment" rows="3"></textarea>
-    <button id="bookBtn">Записаться</button>
-    <p id="msg" class="msg"></p>
+  <div class="page">
+    <h2>Запись на груминг</h2>
+    <div class="box" id="form">
+      <label class="field">Питомец <select id="pet"></select></label>
+      <label class="field">Услуга <select id="service"></select></label>
+      <div class="price-info" id="serviceInfo"></div>
+      <label class="field">Дата <input type="date" id="date"></label>
+      <div class="hint">Свободное время:</div>
+      <div id="slots" class="hint">Выберите дату</div>
+      <label class="field">Комментарий для мастера <textarea id="comment" rows="3"></textarea></label>
+      <button class="primary" id="bookBtn">Записаться</button>
+      <p id="msg" class="msg"></p>
+    </div>
   </div>
 
   <script src="common.js"></script>
@@ -38,7 +40,7 @@
         return;
       }
       if (pets.length === 0) {
-        document.getElementById('form').innerHTML = '<p>Сначала <a href="pets.html">добавьте питомца</a>.</p>';
+        document.getElementById('form').outerHTML = emptyBlock('Сначала <a href="pets.html">добавьте питомца</a>.');
         return;
       }
       document.getElementById('pet').innerHTML = pets.map(p => '<option value="' + p.id + '">' + esc(p.name) + '</option>').join('');
@@ -53,7 +55,7 @@
 
     function showServiceInfo() {
       const s = services.find(x => x.id == document.getElementById('service').value);
-      document.getElementById('serviceInfo').textContent = s ? s.description + '. Цена: ' + s.price + ' руб., длительность: ' + s.duration + ' мин.' : '';
+      document.getElementById('serviceInfo').textContent = s ? s.description + ' · ' + s.price + ' руб. · ' + s.duration + ' мин' : '';
     }
 
     async function loadSlots() {

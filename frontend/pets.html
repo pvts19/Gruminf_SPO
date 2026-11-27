@@ -2,31 +2,35 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Мои питомцы</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div id="menu"></div>
 
-  <h2>Мои питомцы</h2>
-  <div id="list">Загрузка...</div>
+  <div class="page">
+    <h2>Мои питомцы</h2>
+    <div id="list" class="hint">Загрузка...</div>
 
-  <div class="box">
-    <h3 id="formTitle">Добавить питомца</h3>
-    <form id="petForm">
-      Кличка <input name="name" required>
-      Вид
-      <select name="species">
-        <option>собака</option>
-        <option>кошка</option>
-        <option>другое</option>
-      </select>
-      Порода <input name="breed">
-      Вес, кг <input name="weight" type="number" step="0.1" min="0.1" max="100" required>
-      <button type="submit">Сохранить</button>
-      <button type="button" onclick="resetForm()">Очистить</button>
-    </form>
-    <p id="msg" class="msg"></p>
+    <div class="box">
+      <h3 id="formTitle">Добавить питомца</h3>
+      <form id="petForm">
+        <label class="field">Кличка <input name="name" required></label>
+        <label class="field">Вид
+          <select name="species">
+            <option>собака</option>
+            <option>кошка</option>
+            <option>другое</option>
+          </select>
+        </label>
+        <label class="field">Порода <input name="breed"></label>
+        <label class="field">Вес, кг <input name="weight" type="number" step="0.1" min="0.1" max="100" required></label>
+        <button type="submit">Сохранить</button>
+        <button type="button" onclick="resetForm()">Очистить</button>
+      </form>
+      <p id="msg" class="msg"></p>
+    </div>
   </div>
 
   <script src="common.js"></script>
@@ -34,6 +38,7 @@
     initPage();
     let pets = [];
     let editId = null;
+    const ICON = { 'собака': '🐶', 'кошка': '🐱', 'другое': '🐾' };
 
     async function load() {
       try {
@@ -43,15 +48,15 @@
         return;
       }
       if (pets.length === 0) {
-        document.getElementById('list').innerHTML = '<p>У вас пока нет питомцев. Добавьте первого ниже.</p>';
+        document.getElementById('list').innerHTML = emptyBlock('У вас пока нет питомцев. Добавьте первого ниже.');
         return;
       }
       let html = '<table><tr><th>Кличка</th><th>Вид</th><th>Порода</th><th>Вес</th><th></th></tr>';
       for (const p of pets) {
-        html += '<tr><td>' + esc(p.name) + '</td><td>' + p.species + '</td><td>' + esc(p.breed) +
-          '</td><td>' + p.weight + ' кг</td><td>' +
-          '<button onclick="edit(' + p.id + ')">Изменить</button> ' +
-          '<button onclick="removePet(' + p.id + ')">Удалить</button></td></tr>';
+        html += '<tr><td><b>' + ICON[p.species] + ' ' + esc(p.name) + '</b></td><td>' + p.species + '</td><td>' + esc(p.breed) +
+          '</td><td>' + p.weight + ' кг</td><td class="actions">' +
+          '<button class="small" onclick="edit(' + p.id + ')">Изменить</button> ' +
+          '<button class="small danger" onclick="removePet(' + p.id + ')">Удалить</button></td></tr>';
       }
       document.getElementById('list').innerHTML = html + '</table>';
     }

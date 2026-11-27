@@ -45,16 +45,30 @@ function initPage(onlyAdmin) {
     return null;
   }
 
-  let links = '';
+  let pages;
   if (user.role === 'admin') {
-    links = '<a href="admin.html">Записи</a> <a href="services.html">Услуги</a>';
+    pages = [['admin.html', 'Записи'], ['services.html', 'Услуги']];
   } else {
-    links = '<a href="pets.html">Мои питомцы</a> <a href="book.html">Записаться</a> <a href="my.html">Мои записи</a>';
+    pages = [['pets.html', 'Мои питомцы'], ['book.html', 'Записаться'], ['my.html', 'Мои записи']];
+  }
+  // подсвечиваем ссылку на текущую страницу
+  const current = location.pathname.split('/').pop();
+  let links = '';
+  for (const p of pages) {
+    links += '<a class="link' + (p[0] === current ? ' active' : '') + '" href="' + p[0] + '">' + p[1] + '</a>';
   }
   document.getElementById('menu').innerHTML =
-    '<b>Груминг-салон «Пушистик»</b> ' + links +
-    ' <span class="right">' + esc(user.name) + ' <button onclick="logout()">Выйти</button></span>';
+    '<a class="logo" href="' + pages[0][0] + '">🐾 Пушистик</a>' + links +
+    '<span class="user">' + esc(user.name) + '</span><button class="small" onclick="logout()">Выйти</button>';
   return user;
+}
+
+function statusBadge(status) {
+  return '<span class="badge ' + status + '">' + STATUS[status] + '</span>';
+}
+
+function emptyBlock(html) {
+  return '<div class="empty">' + html + '</div>';
 }
 
 async function logout() {
